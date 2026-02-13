@@ -27,7 +27,7 @@ $endif$
 $if(theme)$
   <link rel="stylesheet" href="$revealjs-url$/dist/theme/$theme$.css" id="theme">
 $else$
-  <link rel="stylesheet" href="$revealjs-url$/dist/theme/black.css" id="theme">
+  <link rel="stylesheet" href="$revealjs-url$/dist/theme/awecourse.css" id="theme">
 $endif$
 $if(highlight-js)$
   <link rel="stylesheet" href="$revealjs-url$/plugin/highlight/$highlightjs-theme$.css">
@@ -68,7 +68,7 @@ $endif$
 $endif$
 $if(toc)$
 <section id="$idprefix$TOC">
-<nav role="doc-toc"> 
+<nav role="doc-toc">
 $if(toc-title)$
 <h2 id="$idprefix$toc-title">$toc-title$</h2>
 $endif$
@@ -304,28 +304,41 @@ $if(maxScale)$
 $endif$
 $if(mathjax)$
 
-        math: {
-          mathjax: '$mathjaxurl$',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
+        // MathJax4 configuration
+        mathjax4: {
+          tex: {
+            inlineMath: [['$$', '$$'], ['\\(', '\\)']],
+            displayMath: [['$$$$', '$$$$'], ['\\[', '\\]']],
           },
+          startup: {
+            ready() {
+              MathJax.startup.defaultReady();
+              const {STATE} = MathJax._.core.MathItem;
+              MathJax.tex2mml(String.raw`
+                $tools/macros.tex()$
+		      `);
+            }
+          },
+          options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          },
+          output: {
+            font: 'mathjax-newcm',
+            displayOverflow: 'linebreak',
+            linebreaks: {             // options for when overflow is linebreak
+              inline: true,              // true for browser-based breaking of inline equations
+              width: '100%',             // a fixed size or a percentage of the container width
+              lineleading: .2,           // the default lineleading in em units
+              LinebreakVisitor: null     // The LinebreakVisitor to use
+            }
+          }
         },
 $endif$
 
         // reveal.js plugins
         plugins: [
 $if(mathjax)$
-          RevealMath,
+          RevealMath.MathJax4,
 $endif$
 $if(highlight-js)$
           RevealHighlight,
